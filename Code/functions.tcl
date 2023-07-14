@@ -454,3 +454,7 @@ proc PD_exit {} {
 proc PD_sleep {} {
     set ::PD_sleep_timer_start 0
 }
+
+proc PD_skip_to_next_step {} {
+    de1_send_state "skip to next" $::de1_state(SkipToNext)
+}
