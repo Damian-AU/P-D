@@ -262,7 +262,7 @@ dui add variable $::PD_home_pages 240 1440 -font [PD_font font 16] -fill $::PD_s
 dui add dbutton $::PD_home_pages 104 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav4_button \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(light_grey) \
-    -command {PD_longpress_fix; PD_load fav4} -longpress_cmd {PD_fav_save_message}
+    -command {PD_longpress_fix; PD_load fav4} -longpress_cmd {PD_save fav4}
 dui add dbutton $::PD_home_pages 104 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav4_button_on -initial_state hidden \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(fav4_colour) \
@@ -272,7 +272,7 @@ dui add variable $::PD_home_pages 540 1440 -font [PD_font font 16] -fill $::PD_s
 dui add dbutton $::PD_home_pages 404 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav5_button \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(light_grey) \
-    -command {PD_longpress_fix; start_idle} -longpress_cmd {PD_save fav5}
+    -command {PD_longpress_fix; PD_load fav5} -longpress_cmd {PD_save fav5}
 dui add dbutton $::PD_home_pages 404 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav5_button_on -initial_state hidden \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(fav5_colour) \
@@ -282,7 +282,7 @@ dui add variable $::PD_home_pages 840 1440 -font [PD_font font 16] -fill $::PD_s
 dui add dbutton $::PD_home_pages 704 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav6_button \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(light_grey) \
-    -command {PD_longpress_fix; start_espresso} -longpress_cmd {PD_save fav6}
+    -command {PD_longpress_fix; PD_load fav6} -longpress_cmd {PD_save fav6}
 dui add dbutton $::PD_home_pages 704 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav6_button_on -initial_state hidden \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(fav6_colour) \
