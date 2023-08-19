@@ -1,3 +1,4 @@
+theme Pulak
 main_background_colour #000
 black #000
 bg_colour #131313
@@ -18,7 +19,7 @@ font_name {Inter-Regular}
 font_name_bold {PD-Bold-Bold}
 font_awesome {Font Awesome 5 Pro-Regular-400}
 font_awesome_light {Font Awesome 5 Pro-Light-300}
-
+icons icomoon
 icon_bean \Ue910
 icon_bean \Ue90a
 icon_cup \Ue910
@@ -133,3 +134,5 @@ jug_g {}
 jug_size {S}
 milk_g {}
 milk_s 1
+
+

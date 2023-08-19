@@ -94,3 +94,11 @@ proc horizontal_clicker_int {bigincrement smallincrement varname minval maxval x
 	update_onscreen_variables
 	return
 }
+
+
+
+dui add dbutton weight2steam 200 1400 \
+    -bwidth 330 -bheight 120\
+    -labelvariable {Theme = $::PD_settings(theme)} -label_font [PD_font icons 16] -label_fill $::PD_settings(off_white) -label_pos {0.5 0.5} \
+    -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(off_white) \
+    -command {if {$::PD_settings(theme) == "Damian"} {set ::PD_settings(theme) "Pulak"} else {set ::PD_settings(theme) "Damian"}; PD_save PD_settings}

@@ -1,7 +1,7 @@
 ##### temperary patch for longpress#####
 ### todo remove patch when DUI fix reaches to stable app
 
-if { [package vcompare [package version de1app] 1.42.1.42] < 0 } {
+if { [package vcompare [package version de1app] 1.42.1.24] < 0 } {
     set ::dui::item::longpress_threshold 2000
     proc ::dui::item::longpress_press { widget_name longpress_command } {
         variable longpress_threshold
@@ -24,12 +24,10 @@ if { [package vcompare [package version de1app] 1.42.1.42] < 0 } {
     proc PD_longpress_fix {} {
         set ::PD_version_check {Longpress ok}
     }
+    set ::PD_version_check {Longpress ok}
 }
 # note: PD_longpress_fix; added to all dbutton -command options
 ##### end patch #####
-
-
-
 
 
 # left side
@@ -278,7 +276,7 @@ dui add variable $::PD_home_pages 540 1440 -font [PD_font font 16] -fill $::PD_s
 dui add dbutton $::PD_home_pages 404 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav5_button \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(light_grey) \
-    -command {PD_longpress_fix; start_idle} -longpress_cmd {PD_save fav5}
+    -command {PD_longpress_fix; PD_load fav5} -longpress_cmd {PD_save fav5}
 dui add dbutton $::PD_home_pages 404 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav5_button_on -initial_state hidden \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(fav5_colour) \
@@ -288,7 +286,7 @@ dui add variable $::PD_home_pages 840 1440 -font [PD_font font 16] -fill $::PD_s
 dui add dbutton $::PD_home_pages 704 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav6_button \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(light_grey) \
-    -command {PD_longpress_fix; start_espresso} -longpress_cmd {PD_save fav6}
+    -command {PD_longpress_fix; PD_load fav6} -longpress_cmd {PD_save fav6}
 dui add dbutton $::PD_home_pages 704 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav6_button_on -initial_state hidden \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(fav6_colour) \
