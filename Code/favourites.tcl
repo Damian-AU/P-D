@@ -95,9 +95,26 @@ proc PD_clear_fav_colour {} {
     dui item config $::PD_home_pages PD_profile_name -fill $::PD_settings(off_white)
     set keys {fav1 fav2 fav3 fav4 fav5 fav6}
     foreach key $keys {
-        dui item config $::PD_home_pages PD_${key}_label -fill $::PD_settings(off_white)
+        PD_set_fav_label_colour
         dui item config $::PD_home_pages PD_${key}_button_on* -state hidden
         dui item config $::PD_home_pages PD_${key}_button_on* -initial_state hidden
+
+        dui item config $::PD_home_pages PD_${key}_button_blue* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_green* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_orange* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_yellow* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_brown* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_pink* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_red* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_off_white* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_blue* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_green* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_orange* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_yellow* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_brown* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_pink* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_red* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_off_white* -initial_state hidden
     }
 }
 

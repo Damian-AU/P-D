@@ -1,33 +1,39 @@
 ##### temperary patch for longpress#####
-### todo remove patch if DUI is fixed
+### todo remove patch when DUI fix reaches to stable app
 
-        proc ::dui::item::longpress_press { widget_name longpress_command } {
-            variable longpress_threshold
-            set ::dui::item::press_events($widget_name,press) [clock milliseconds]
-            set ::long_press_timer [after $longpress_threshold [subst {
-                if { \[info exists ::dui::item::press_events($widget_name,press)\] } {
-                    unset -nocomplain ::dui::item::press_events($widget_name,press)
-                    uplevel #0 $longpress_command
-                }
-            }]]
-        }
-        proc PD_longpress_fix {} {
-            catch {
-                after cancel $::long_press_timer
-                set ::long_press_timer {}
+if { [package vcompare [package version de1app] 1.42.1.42] < 0 } {
+    set ::dui::item::longpress_threshold 2000
+    proc ::dui::item::longpress_press { widget_name longpress_command } {
+        variable longpress_threshold
+        set ::dui::item::press_events($widget_name,press) [clock milliseconds]
+        set ::long_press_timer [after $longpress_threshold [subst {
+            if { \[info exists ::dui::item::press_events($widget_name,press)\] } {
+                unset -nocomplain ::dui::item::press_events($widget_name,press)
+                uplevel #0 $longpress_command
             }
+        }]]
+    }
+    proc PD_longpress_fix {} {
+        catch {
+            after cancel $::long_press_timer
+            set ::long_press_timer {}
         }
-
-#       note: PD_longpress_fix; added to all dbutton -command options
-
-
+    }
+    set ::PD_version_check {Longpress patch enabled}
+} else {
+    proc PD_longpress_fix {} {
+        set ::PD_version_check {Longpress ok}
+    }
+}
+# note: PD_longpress_fix; added to all dbutton -command options
 ##### end patch #####
 
 
 
 
+
 # left side
-set ::PD_home_pages "off espresso steam flush water"
+set ::PD_home_pages "off espresso steam hotwaterrinse water"
 dui add dbutton $::PD_home_pages 40 40 \
     -bwidth 1010 -bheight 1520 \
     -shape round -radius 30 -fill $::PD_settings(dark_grey)
@@ -262,7 +268,7 @@ dui add variable $::PD_home_pages 240 1440 -font [PD_font font 16] -fill $::PD_s
 dui add dbutton $::PD_home_pages 104 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav4_button \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(light_grey) \
-    -command {PD_longpress_fix; PD_load fav4} -longpress_cmd {PD_fav_save_message}
+    -command {PD_longpress_fix; PD_load fav4} -longpress_cmd {PD_save fav4}
 dui add dbutton $::PD_home_pages 104 1370 \
     -bwidth 272 -bheight 140 -tags PD_fav4_button_on -initial_state hidden \
     -shape outline -width 2 -arc_offset 20 -outline $::PD_settings(fav4_colour) \
@@ -305,7 +311,7 @@ dui add canvas_item line $::PD_home_pages 1976 40 1976 172 -fill $::PD_settings(
 
 
 dui add dtext $::PD_home_pages 1150 110 -text [translate "DATA"] -font [PD_font font_bold 20] -fill $::PD_settings(off_white) -anchor w -justify left
-dui add variable $::PD_home_pages 1412 94 -font [PD_font font_bold 16] -fill $::PD_settings(blue) -anchor center -justify center -width 880 -textvariable {READY}
+dui add variable $::PD_home_pages 1412 94 -font [PD_font font_bold 16] -fill $::PD_settings(blue) -anchor center -justify center -width 880 -textvariable {[PD_start_button_ready]}
 dui add variable $::PD_home_pages 1412 132 -font [PD_font font 13] -fill $::PD_settings(off_white) -anchor center -justify center -width 880 -textvariable {state}
 
 dui add variable $::PD_home_pages 1610 94 -font [PD_font font_bold 16] -fill $::PD_settings(off_white) -anchor center -justify center -width 880 -textvariable {[PD_group_head_heater_temperature_text]}
@@ -525,6 +531,7 @@ add_de1_widget "off espresso" graph 1130 350 {
     $widget element create home_weight  -xdata espresso_elapsed -ydata espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 6] -color $::PD_settings(brown) -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create home_temperature -xdata espresso_elapsed -ydata PD_espresso_temperature_basket -symbol none -label ""  -linewidth [rescale_x_skin 6] -color $::PD_settings(red) -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create home_resistance  -xdata espresso_elapsed -ydata espresso_resistance -symbol none -label "" -linewidth [rescale_x_skin 6] -color $::PD_settings(yellow) -smooth $::settings(live_graph_smoothing_technique) -pixels 0
+    # $widget element create home_resistance  -xdata espresso_elapsed -ydata espresso_resistance -symbol none -label "" -linewidth [rescale_x_skin 6] -color $::PD_settings(dark_white) -smooth $::settings(live_graph_smoothing_technique) -pixels 0
     $widget axis configure x -color $::PD_settings(off_white) -tickfont [PD_font font 16] -min 0.0;
     $widget axis configure y -color $::PD_settings(green) -tickfont [PD_font font 16] -min 0.0 -max $::de1(max_pressure) -subdivisions 5 -majorticks {0  2  4  6  8  10  12}  -hide 0;
     $widget axis configure y2 -color $::PD_settings(blue) -tickfont [PD_font font 16] -min 0.0 -max 6 -subdivisions 2 -majorticks {0  1  2  3  4  5  6} -hide 0;

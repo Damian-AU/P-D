@@ -65,7 +65,6 @@ proc PD_save {key} {
     }
 
     if {$key == "fav1" || $key == "fav2" || $key == "fav3" || $key == "fav4" || $key == "fav5" || $key == "fav6"} {
-
         set ::PD_settings(fav_key) $key
         set ::PD_settings(fav_profile) $::PD_settings($key)
         set _colour _colour
@@ -102,6 +101,29 @@ proc PD_save {key} {
         dui item config $::PD_home_pages PD_${key}_label -fill $::PD_settings(fav_colour)
         dui item config $::PD_home_pages PD_${key}_button_on* -state normal
         dui item config $::PD_home_pages PD_${key}_button_on* -initial_state normal
+
+        set colour_name $::PD_settings(${key}_colour_name)
+        dui item config $::PD_home_pages PD_${key}_button_blue* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_green* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_orange* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_yellow* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_brown* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_pink* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_red* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_off_white* -state hidden
+        dui item config $::PD_home_pages PD_${key}_button_blue* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_green* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_orange* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_yellow* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_brown* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_pink* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_red* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_off_white* -initial_state hidden
+        dui item config $::PD_home_pages PD_${key}_button_${colour_name}* -state normal
+        dui item config $::PD_home_pages PD_${key}_button_${colour_name}* -initial_state normal
+        PD_fav_option_hide_13
+        PD_fav_option_hide_46
+
         PD_save PD_settings
     }
     PD_check_steam_off_button
@@ -118,6 +140,26 @@ proc PD_load {key} {
             dui item config $::PD_home_pages PD_${key}_label -fill $::PD_settings(fav_colour)
             dui item config $::PD_home_pages PD_${key}_button_on* -state normal
             dui item config $::PD_home_pages PD_${key}_button_on* -initial_state normal
+
+            set colour_name $::PD_settings(${key}_colour_name)
+            dui item config $::PD_home_pages PD_${key}_button_blue* -state hidden
+            dui item config $::PD_home_pages PD_${key}_button_green* -state hidden
+            dui item config $::PD_home_pages PD_${key}_button_orange* -state hidden
+            dui item config $::PD_home_pages PD_${key}_button_yellow* -state hidden
+            dui item config $::PD_home_pages PD_${key}_button_brown* -state hidden
+            dui item config $::PD_home_pages PD_${key}_button_pink* -state hidden
+            dui item config $::PD_home_pages PD_${key}_button_red* -state hidden
+            dui item config $::PD_home_pages PD_${key}_button_off_white* -state hidden
+            dui item config $::PD_home_pages PD_${key}_button_blue* -initial_state hidden
+            dui item config $::PD_home_pages PD_${key}_button_green* -initial_state hidden
+            dui item config $::PD_home_pages PD_${key}_button_orange* -initial_state hidden
+            dui item config $::PD_home_pages PD_${key}_button_yellow* -initial_state hidden
+            dui item config $::PD_home_pages PD_${key}_button_brown* -initial_state hidden
+            dui item config $::PD_home_pages PD_${key}_button_pink* -initial_state hidden
+            dui item config $::PD_home_pages PD_${key}_button_red* -initial_state hidden
+            dui item config $::PD_home_pages PD_${key}_button_off_white* -initial_state hidden
+            dui item config $::PD_home_pages PD_${key}_button_${colour_name}* -state normal
+            dui item config $::PD_home_pages PD_${key}_button_${colour_name}* -initial_state normal
 
             array unset -nocomplain fav_settings
             array set fav_settings [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/User_Settings/$key.fav"]]

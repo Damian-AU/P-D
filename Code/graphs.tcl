@@ -1,4 +1,4 @@
-add_de1_variable "off espresso" 0 2000 -font [PD_font font 6] -fill #000 -textvariable {
+add_de1_variable "off espresso steam" 0 2000 -font [PD_font font 6] -fill #000 -textvariable {
     [pressure_text]
     [waterflow_text]
     [waterweight_text]
@@ -16,7 +16,7 @@ add_de1_variable "off espresso" 0 2000 -font [PD_font font 6] -fill #000 -textva
 
 blt::vector create PD_espresso_temperature_basket PD_espresso_temperature_mix PD_espresso_temperature_goal
 blt::vector create PD_pressure_goal PD_flow_goal PD_temperature_goal PD_pressure PD_flow PD_weight PD_temperature PD_resistance
-
+blt::vector create PD_steam_temperature
 
 proc PD_live_graph_list {} {
 	return [list PD_espresso_temperature_basket PD_espresso_temperature_mix PD_espresso_temperature_goal espresso_elapsed espresso_pressure espresso_weight espresso_weight_chartable espresso_flow espresso_flow_weight espresso_flow_weight_raw espresso_water_dispensed espresso_flow_weight_2x espresso_flow_2x espresso_resistance espresso_resistance_weight espresso_pressure_delta espresso_flow_delta espresso_flow_delta_negative espresso_flow_delta_negative_2x espresso_temperature_mix espresso_temperature_basket espresso_state_change espresso_pressure_goal espresso_flow_goal espresso_flow_goal_2x espresso_temperature_goal espresso_de1_explanation_chart_flow espresso_de1_explanation_chart_elapsed_flow espresso_de1_explanation_chart_flow_2x espresso_de1_explanation_chart_flow_1_2x espresso_de1_explanation_chart_flow_2_2x espresso_de1_explanation_chart_flow_3_2x espresso_de1_explanation_chart_pressure espresso_de1_explanation_chart_temperature espresso_de1_explanation_chart_temperature_10 espresso_de1_explanation_chart_pressure_1 espresso_de1_explanation_chart_pressure_2 espresso_de1_explanation_chart_pressure_3 espresso_de1_explanation_chart_elapsed_flow espresso_de1_explanation_chart_elapsed_flow_1 espresso_de1_explanation_chart_elapsed_flow_2 espresso_de1_explanation_chart_elapsed_flow_3 espresso_de1_explanation_chart_elapsed espresso_de1_explanation_chart_elapsed_1 espresso_de1_explanation_chart_elapsed_2 espresso_de1_explanation_chart_elapsed_3]
@@ -42,12 +42,13 @@ proc PD_backup_live_graph {} {
 		}
 	}
 
-	PD_save PD_graphs
+	#PD_save PD_graphs
 }
 
 ::de1::event::listener::after_flow_complete_add [lambda {event_dict} {
     if { [dict get $event_dict previous_state] == "Espresso" } {
         PD_backup_live_graph
+        PD_save PD_graphs
     }
 }]
 
@@ -67,50 +68,8 @@ proc PD_restore_live_graphs {} {
 }
 
 proc PD_restore_graphs {} {
-    after 1 {PD_restore_live_graphs}
-}
-
-
-
-set {} {
-proc PD_steam_graph_list {} {
-	return [list steam_elapsed steam_temperature steam_flow steam_pressure]
-}
-
-proc PD_backup_steam_graph {} {
-	foreach sg [PD_steam_graph_list] {
-	unset -nocomplain ::PD_graphs(steam_graph_$sg)
-		if {[$sg length] > 0} {
-			set ::PD_graphs(steam_graph_$sg) [$sg range 0 end]
-		} else {
-			set ::PD_graphs(steam_graph_$sg) {}
-		}
-	}
-    PD_save PD_graphs
-}
-
-::de1::event::listener::on_major_state_change_add [lambda {event_dict} {
-    if { [dict get $event_dict previous_state] == "Steam" } {
-        PD_backup_steam_graph
-    }
-}]
-proc PD_restore_steam_graph {} {
-	set last_elapsed_time_index [expr {[espresso_elapsed length] - 1}]
-	foreach sg [PD_steam_graph_list] {
-		$sg length 0
-		if {[info exists ::PD_settings(steam_graph_$sg)] == 1} {
-			$sg append $::PD_settings(steam_graph_$sg)
-		}
-
-	}
-}
-
-proc PD_restore_graphs {} {
     after 1 {PD_restore_live_graphs; PD_restore_steam_graph}
 }
-
-}
-
 
 proc clear_temp_data {args} {
 	PD_espresso_temperature_basket length 0
@@ -168,53 +127,153 @@ proc ::gui::update::append_live_data_to_espresso_chart {event_dict args} {
 
 
 proc PD_toggle_graph {curve} {
-    if {$::PD_settings($curve) > 0} {
-        set ::PD_settings($curve) 0
-        if {$curve == "pressure" || $curve == "temperature" || $curve == "flow"} {
-            $::PD_home_espresso_graph_1 element configure home_${curve}_goal -linewidth 0
-            $::PD_espresso_zoomed_graph element configure home_${curve}_goal -linewidth 0
-        }
-        $::PD_home_espresso_graph_1 element configure home_${curve} -linewidth 0
-        $::PD_espresso_zoomed_graph element configure home_${curve} -linewidth 0
-        dui item config $::PD_home_pages ${curve}_text -fill $::PD_settings(light_grey)
-        dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(light_grey) -outline $::PD_settings(light_grey)
-        dui item config "off_zoomed espresso_zoomed" ${curve}_text -fill $::PD_settings(light_grey)
-        dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(light_grey) -outline $::PD_settings(light_grey)
-    } else {
-        set ::PD_settings($curve) 1
-        if {$curve == "pressure" || $curve == "temperature" || $curve == "flow"} {
-            $::PD_home_espresso_graph_1 element configure home_${curve}_goal -linewidth [rescale_x_skin 4]
-            $::PD_espresso_zoomed_graph element configure home_${curve}_goal -linewidth [rescale_x_skin 4]
-        }
-        $::PD_home_espresso_graph_1 element configure home_${curve} -linewidth [rescale_x_skin 6]
-        $::PD_espresso_zoomed_graph element configure home_${curve} -linewidth [rescale_x_skin 6]
-        dui item config $::PD_home_pages ${curve}_text -fill $::PD_settings(off_white)
-        dui item config "off_zoomed espresso_zoomed" ${curve}_text -fill $::PD_settings(off_white)
-        if {$curve == "pressure"} {
-            dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(green) -outline $::PD_settings(green)
-            dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(green) -outline $::PD_settings(green)
-        }
-        if {$curve == "temperature"} {
-            dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(red) -outline $::PD_settings(red)
-            dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(red) -outline $::PD_settings(red)
-        }
-        if {$curve == "flow"} {
-            dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(blue) -outline $::PD_settings(blue)
-            dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(blue) -outline $::PD_settings(blue)
-        }
-        if {$curve == "weight"} {
-            dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(brown) -outline $::PD_settings(brown)
-            dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(brown) -outline $::PD_settings(brown)
-        }
-        if {$curve == "resistance"} {
-            dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(yellow) -outline $::PD_settings(yellow)
-            dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(yellow) -outline $::PD_settings(yellow)
-        }
+    if {$curve == "steam_pressure" || $curve == "steam_temperature" || $curve == "steam_flow"} {
+        if {$::PD_settings($curve) > 0} {
+            set ::PD_settings($curve) 0
+            $::PD_home_steam_graph_1 element configure home_${curve} -linewidth 0
+            $::PD_home_steam_graph element configure home_${curve} -linewidth 0
+            dui item config off ${curve}_text -fill $::PD_settings(light_grey)
+            dui item config espresso ${curve}_data -fill $::PD_settings(light_grey)
+            dui item config off ${curve}_icon -fill $::PD_settings(light_grey) -outline $::PD_settings(light_grey)
+            dui item config "steam" ${curve}_text -fill $::PD_settings(light_grey)
+            dui item config "steam" ${curve}_icon -fill $::PD_settings(light_grey) -outline $::PD_settings(light_grey)
+            dui item config off steam_${curve}_text -fill $::PD_settings(light_grey)
+            dui item config off steam_${curve}_icon -fill $::PD_settings(light_grey) -outline $::PD_settings(light_grey)
+            dui item config "steam" steam_${curve}_text -fill $::PD_settings(light_grey)
+            dui item config "steam" steam_${curve}_icon -fill $::PD_settings(light_grey) -outline $::PD_settings(light_grey)
+        } else {
+            set ::PD_settings($curve) 1
+            $::PD_home_steam_graph_1 element configure home_${curve} -linewidth [rescale_x_skin 6]
+            $::PD_home_steam_graph element configure home_${curve} -linewidth [rescale_x_skin 6]
 
+            dui item config off steam_${curve}_text -fill $::PD_settings(off_white)
+            dui item config "steam" steam_${curve}_text -fill $::PD_settings(off_white)
+            dui item config off steam_${curve}_text -fill $::PD_settings(off_white)
+            dui item config "steam" steam_${curve}_text -fill $::PD_settings(off_white)
+            if {$curve == "steam_pressure"} {
+                dui item config off ${curve}_icon -fill $::PD_settings(green) -outline $::PD_settings(green)
+                dui item config off ${curve}_text -fill $::PD_settings(green)
+                dui item config steam ${curve}_text -fill $::PD_settings(green)
+                dui item config "steam" ${curve}_icon -fill $::PD_settings(green) -outline $::PD_settings(green)
+                dui item config off steam_${curve}_icon -fill $::PD_settings(green) -outline $::PD_settings(green)
+                dui item config "steam" steam_${curve}_icon -fill $::PD_settings(green) -outline $::PD_settings(green)
+            }
+            if {$curve == "steam_temperature"} {
+                dui item config off ${curve}_icon -fill $::PD_settings(red) -outline $::PD_settings(red)
+                dui item config off ${curve}_text -fill $::PD_settings(red)
+                dui item config steam ${curve}_text -fill $::PD_settings(red)
+                dui item config "steam" ${curve}_icon -fill $::PD_settings(red) -outline $::PD_settings(red)
+                dui item config off steam_${curve}_icon -fill $::PD_settings(red) -outline $::PD_settings(red)
+                dui item config "steam" steam_${curve}_icon -fill $::PD_settings(red) -outline $::PD_settings(red)
+            }
+            if {$curve == "steam_flow"} {
+                dui item config off ${curve}_icon -fill $::PD_settings(blue) -outline $::PD_settings(blue)
+                dui item config off ${curve}_text -fill $::PD_settings(blue)
+                dui item config steam ${curve}_text -fill $::PD_settings(blue)
+                dui item config "steam" ${curve}_icon -fill $::PD_settings(blue) -outline $::PD_settings(blue)
+                dui item config off steam_${curve}_icon -fill $::PD_settings(blue) -outline $::PD_settings(blue)
+                dui item config "steam" steam_${curve}_icon -fill $::PD_settings(blue) -outline $::PD_settings(blue)
+            }
+            if {$::settings(enable_fahrenheit) == 1} {
+                $::PD_home_steam_graph_1 axis configure y2 -color $::PD_settings(off_white) -tickfont [PD_font font 16] -min 266 -max 356 -majorticks {266 275 284 293 302 311 320 329 338 347 356}
+                $::PD_home_steam_graph_1 axis configure y -max 5 -min 0.0 -majorticks {0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5}
+                $::PD_home_steam_graph axis configure y2 -color $::PD_settings(off_white) -tickfont [PD_font font 16] -min 266 -max 356 -majorticks {266 275 284 293 302 311 320 329 338 347 356}
+                $::PD_home_steam_graph axis configure y -max 5 -min 0.0 -majorticks {0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5}
+            } else {
+                $::PD_home_steam_graph_1 axis configure y2 -color $::PD_settings(red) -min 130 -max 180 -majorticks {130 135 140 145 150 155 160 165 170 175 180}
+                $::PD_home_steam_graph_1 axis configure y -max 5 -min 0.0 -majorticks {0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5}
+                $::PD_home_steam_graph axis configure y2 -color $::PD_settings(red) -min 130 -max 180 -majorticks {130 135 140 145 150 155 160 165 170 175 180}
+                $::PD_home_steam_graph axis configure y -max 5 -min 0.0 -majorticks {0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5}
+            }
+        }
+    } else {
+        if {$::PD_settings($curve) > 0} {
+            set ::PD_settings($curve) 0
+            if {$curve == "pressure" || $curve == "temperature" || $curve == "flow"} {
+                $::PD_home_espresso_graph_1 element configure home_${curve}_goal -linewidth 0
+                $::PD_espresso_zoomed_graph element configure home_${curve}_goal -linewidth 0
+            }
+            $::PD_home_espresso_graph_1 element configure home_${curve} -linewidth 0
+            $::PD_espresso_zoomed_graph element configure home_${curve} -linewidth 0
+            dui item config $::PD_home_pages ${curve}_text -fill $::PD_settings(light_grey)
+            dui item config espresso ${curve}_data -fill $::PD_settings(light_grey)
+            dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(light_grey) -outline $::PD_settings(light_grey)
+            dui item config "off_zoomed espresso_zoomed" ${curve}_text -fill $::PD_settings(light_grey)
+            dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(light_grey) -outline $::PD_settings(light_grey)
+        } else {
+            set ::PD_settings($curve) 1
+            if {$curve == "pressure" || $curve == "temperature" || $curve == "flow"} {
+                $::PD_home_espresso_graph_1 element configure home_${curve}_goal -linewidth [rescale_x_skin 4]
+                $::PD_espresso_zoomed_graph element configure home_${curve}_goal -linewidth [rescale_x_skin 4]
+            }
+            if {$curve == "steps"} {
+                $::PD_home_espresso_graph_1 element configure home_${curve} -linewidth [rescale_x_skin 2]
+                $::PD_espresso_zoomed_graph element configure home_${curve} -linewidth [rescale_x_skin 2]
+            } else {
+                $::PD_home_espresso_graph_1 element configure home_${curve} -linewidth [rescale_x_skin 6]
+                $::PD_espresso_zoomed_graph element configure home_${curve} -linewidth [rescale_x_skin 6]
+            }
+            dui item config $::PD_home_pages ${curve}_text -fill $::PD_settings(off_white)
+            dui item config espresso ${curve}_data -fill $::PD_settings(off_white)
+            dui item config "off_zoomed espresso_zoomed" ${curve}_text -fill $::PD_settings(off_white)
+            if {$curve == "pressure"} {
+                dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(green) -outline $::PD_settings(green)
+                dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(green) -outline $::PD_settings(green)
+            }
+            if {$curve == "temperature"} {
+                dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(red) -outline $::PD_settings(red)
+                dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(red) -outline $::PD_settings(red)
+            }
+            if {$curve == "flow"} {
+                dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(blue) -outline $::PD_settings(blue)
+                dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(blue) -outline $::PD_settings(blue)
+            }
+            if {$curve == "weight"} {
+                dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(brown) -outline $::PD_settings(brown)
+                dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(brown) -outline $::PD_settings(brown)
+            }
+            if {$curve == "resistance"} {
+                dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(yellow) -outline $::PD_settings(yellow)
+                dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(yellow) -outline $::PD_settings(yellow)
+            }
+            if {$curve == "steps"} {
+                dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(dark_white) -outline $::PD_settings(dark_white)
+                dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(dark_white) -outline $::PD_settings(dark_white)
+            }
+            $::PD_home_espresso_graph_1 axis configure y -max $::PD_settings(zoomed_y_axis_max) -min $::PD_settings(zoomed_y_axis_min)
+            $::PD_home_espresso_graph_1 axis configure y2 -max $::PD_settings(zoomed_y2_axis_max) -min $::PD_settings(zoomed_y2_axis_min)
+            $::PD_espresso_zoomed_graph axis configure y -max $::PD_settings(zoomed_y_axis_max) -min $::PD_settings(zoomed_y_axis_min)
+            $::PD_espresso_zoomed_graph axis configure y2 -max $::PD_settings(zoomed_y2_axis_max) -min $::PD_settings(zoomed_y2_axis_min)
+        }
     }
+    PD_save PD_settings
 }
 
-
+proc PD_setup_home_espresso_graph_1 {} {
+    foreach curve {pressure temperature flow weight resistance steps} {
+        if {$::PD_settings($curve) < 1} {
+            if {$curve == "pressure" || $curve == "temperature" || $curve == "flow"} {
+            $::PD_home_espresso_graph_1 element configure home_${curve}_goal -linewidth 0
+        }
+        $::PD_home_espresso_graph_1 element configure home_${curve} -linewidth 0
+        dui item config $::PD_home_pages ${curve}_text -fill $::PD_settings(light_grey)
+        dui item config espresso ${curve}_data -fill $::PD_settings(light_grey)
+        dui item config $::PD_home_pages ${curve}_icon -fill $::PD_settings(light_grey) -outline $::PD_settings(light_grey)
+        }
+    }
+}
+proc PD_setup_espresso_zoomed_graph {} {
+    foreach curve {pressure temperature flow weight resistance steps} {
+        if {$::PD_settings($curve) < 1} {
+            if {$curve == "pressure" || $curve == "temperature" || $curve == "flow"} {
+            $::PD_espresso_zoomed_graph element configure home_${curve}_goal -linewidth 0
+        }
+        $::PD_espresso_zoomed_graph element configure home_${curve} -linewidth 0
+        dui item config "off_zoomed espresso_zoomed" ${curve}_text -fill $::PD_settings(light_grey)
+        dui item config "off_zoomed espresso_zoomed" ${curve}_icon -fill $::PD_settings(light_grey) -outline $::PD_settings(light_grey)
+        }
+    }
+}
 
 
 

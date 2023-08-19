@@ -1,6 +1,6 @@
 ############# comment de1_skin_settings.tcl lines 130 & 140 to show SAW settings
 
-#### UI design by Pulak Bhatnagar ####
+#### UI design by Pulak Bhatnagar & Damian Brakel####
 #### Coded by Damian Brakel ####
 #### Insired by Diaspora Community Contributions ####
 
@@ -18,6 +18,7 @@ proc check_MySaver_exists {} {
         set_de1_screen_saver_directory "[homedir]/MySaver"
     }
 }
+
 check_MySaver_exists
 array set ::PD_settings [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/default_settings.tcl"]]
 
@@ -34,8 +35,9 @@ proc PD_join_files_in_dir {dir} {
 }
 PD_join_files_in_dir Code
 PD_join_files_in_dir Common_pages
-
 PD_join_files_in_dir Themes/$::PD_settings(theme)
+PD_join_files_in_dir Plugins
+
 if {[file exists "[skin_directory]/User_Settings/PD_graphs.tdb"]} {
     array set ::PD_graphs [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/User_Settings/PD_graphs.tdb"]]
 }
@@ -43,7 +45,6 @@ if {[file exists "[skin_directory]/User_Settings/PD_graphs.tdb"]} {
 
 set ::settings(export_history_automatically_to_csv) 0
 set ::settings(disable_long_press) 0
-set ::dui::item::longpress_threshold 2000
 
 if {[file exists "[skin_directory]/Damian.end"]} {
     source  [file join "./skins/P&D/" Damian.end]

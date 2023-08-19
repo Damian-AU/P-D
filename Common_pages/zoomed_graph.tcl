@@ -3,11 +3,13 @@ dui add canvas_item rect "off_zoomed espresso_zoomed" 296 72 318 94 -outline $::
 dui add canvas_item rect "off_zoomed espresso_zoomed" 542 72 564 94 -outline $::PD_settings(blue) -fill $::PD_settings(blue) -tags flow_icon
 dui add canvas_item rect "off_zoomed espresso_zoomed" 784 72 806 94 -outline $::PD_settings(brown) -fill $::PD_settings(brown) -tags weight_icon
 dui add canvas_item rect "off_zoomed espresso_zoomed" 1016 72 1038 94 -outline $::PD_settings(yellow) -fill $::PD_settings(yellow) -tags resistance_icon
+dui add canvas_item rect "off_zoomed espresso_zoomed" 1296 72 1318 94 -outline $::PD_settings(dark_white) -fill $::PD_settings(dark_white) -tags steps_icon
 dui add variable "off_zoomed espresso_zoomed" 138 84 -tags pressure_text -font [PD_font font 13] -fill $::PD_settings(off_white) -anchor w -justify center -width 880 -textvariable {[translate "Pressure"]}
 dui add variable "off_zoomed espresso_zoomed" 334 84 -tags temperature_text -font [PD_font font 13] -fill $::PD_settings(off_white) -anchor w -justify center -width 880 -textvariable {[translate "Temperature"]}
 dui add variable "off_zoomed espresso_zoomed" 580 84 -tags flow_text -font [PD_font font 13] -fill $::PD_settings(off_white) -anchor w -justify center -width 880 -textvariable {[translate "Flow in Puck"]}
 dui add variable "off_zoomed espresso_zoomed" 822 84 -tags weight_text -font [PD_font font 13] -fill $::PD_settings(off_white) -anchor w -justify center -width 880 -textvariable {[translate "Flow in Cup"]}
 dui add variable "off_zoomed espresso_zoomed" 1054 84 -tags resistance_text -font [PD_font font 13] -fill $::PD_settings(off_white) -anchor w -justify center -width 880 -textvariable {[translate "Puck Resistance"]}
+dui add variable "off_zoomed espresso_zoomed" 1334 84 -tags steps_text -font [PD_font font 13] -fill $::PD_settings(off_white) -anchor w -justify center -width 880 -textvariable {[translate "Steps"]}
 dui add dbutton "off_zoomed espresso_zoomed" 100 34 \
     -bwidth 190 -bheight 110 \
     -command {PD_longpress_fix; PD_toggle_graph pressure}
@@ -23,29 +25,20 @@ dui add dbutton "off_zoomed espresso_zoomed" 812 34 \
 dui add dbutton "off_zoomed espresso_zoomed" 1044 34 \
     -bwidth 190 -bheight 110 \
     -command {PD_longpress_fix; PD_toggle_graph resistance}
+dui add dbutton "off_zoomed espresso_zoomed" 1324 34 \
+    -bwidth 190 -bheight 110 \
+    -command {PD_longpress_fix; PD_toggle_graph steps}
 
-# todo change the following two buttons to icons fonts when we get a down arrow added to the font file
+
 dui add dbutton "off_zoomed espresso_zoomed" 1610 38 \
-    -bwidth 90 -bheight 90 \
-    -labelvariable {\Uf063} -label_font [PD_font awesome 22] -label_fill $::PD_settings(off_white) -label_pos {0.5 0.5} \
-    -shape outline -width 2 -arc_offset 45 -outline $::PD_settings(light_grey) \
-    -command {PD_longpress_fix; PD_scroll_up}
-dui add dbutton "off_zoomed espresso_zoomed" 1870 38 \
-    -bwidth 90 -bheight 90 \
-    -labelvariable {\Uf062} -label_font [PD_font awesome 22] -label_fill $::PD_settings(off_white) -label_pos {0.5 0.5} \
-    -shape outline -width 2 -arc_offset 45 -outline $::PD_settings(light_grey) \
-    -command {PD_longpress_fix; PD_scroll_down}
-
-dui add variable "off_zoomed espresso_zoomed" 1784 84 -font [PD_font font_bold 15] -fill $::PD_settings(green) -anchor center -justify center -width 880 -textvariable {[translate "Graph"]}
-
-###dui add dbutton "off_zoomed espresso_zoomed" 1610 38 \
     -bwidth 90 -bheight 90 \
     -labelvariable {$::PD_settings(icon_downarrow)} -label_font [PD_font icons 48] -label_fill $::PD_settings(off_white) -label_pos {0.5 0.5} \
     -shape outline -width 2 -arc_offset 45 -outline $::PD_settings(light_grey) \
     -command {PD_longpress_fix; PD_scroll_up}
 
+dui add variable "off_zoomed espresso_zoomed" 1784 84 -font [PD_font font_bold 15] -fill $::PD_settings(green) -anchor center -justify center -width 880 -textvariable {[translate "Graph"]}
 
-###dui add dbutton "off_zoomed espresso_zoomed" 1870 38 \
+dui add dbutton "off_zoomed espresso_zoomed" 1870 38 \
     -bwidth 90 -bheight 90 \
     -labelvariable {$::PD_settings(icon_uparrow)} -label_font [PD_font icons 48] -label_fill $::PD_settings(off_white) -label_pos {0.5 0.5} \
     -shape outline -width 2 -arc_offset 45 -outline $::PD_settings(light_grey) \
@@ -84,11 +77,13 @@ add_de1_widget "off_zoomed espresso_zoomed" graph 40 165 {
     $widget element create home_weight  -xdata espresso_elapsed -ydata espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 6] -color $::PD_settings(brown) -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create home_temperature -xdata espresso_elapsed -ydata PD_espresso_temperature_basket -symbol none -label ""  -linewidth [rescale_x_skin 6] -color $::PD_settings(red) -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create home_resistance  -xdata espresso_elapsed -ydata espresso_resistance -symbol none -label "" -linewidth [rescale_x_skin 6] -color $::PD_settings(yellow) -smooth $::settings(live_graph_smoothing_technique) -pixels 0
+    $widget element create home_steps -xdata espresso_elapsed -ydata espresso_state_change -label "" -linewidth [rescale_x_skin 2] -color $::PD_settings(dark_white)  -pixels 0 ;
     $widget axis configure x -color $::PD_settings(off_white) -tickfont [PD_font font 16] -min 0.0;
     $widget axis configure y -color $::PD_settings(green) -tickfont [PD_font font 16] -min $::PD_settings(zoomed_y_axis_min) -max $::PD_settings(zoomed_y_axis_max) -subdivisions 5 -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15}  -hide 0;
     $widget axis configure y2 -color $::PD_settings(blue) -tickfont [PD_font font 16] -min $::PD_settings(zoomed_y2_axis_min) -max $::PD_settings(zoomed_y2_axis_max) -subdivisions 2 -majorticks {0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5 5.5 6 6.5 7 7.5 8} -hide 0;
     $widget grid configure -color $::PD_settings(grid_colour) -dashes {5 5} -linewidth 1
 } -plotbackground $::PD_settings(bg_colour) -width [rescale_x_skin 2480] -height [rescale_y_skin 1200] -borderwidth 1 -background $::PD_settings(bg_colour) -plotrelief flat
+PD_setup_espresso_zoomed_graph
 
 dui add dbutton "off_zoomed espresso_zoomed" 90 1406 \
     -bwidth 2040 -bheight 136 \
@@ -142,3 +137,4 @@ dui add dbutton "off_zoomed espresso_zoomed" 2370 1422 \
     -bwidth 90 -bheight 90 \
     -labelvariable {$::PD_settings(icon_stop)} -label_font [PD_font icons 48] -label_fill $::PD_settings(red) -label_pos {0.5 0.5} \
     -command {PD_longpress_fix; set_next_page off off; start_idle}
+
